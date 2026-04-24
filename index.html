@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fan Voting App</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .app-container {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .party-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #ccc;
+        }
+        .count { font-size: 1.5rem; font-weight: bold; }
+        .btn-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 10px; 
+            margin-top: 20px; 
+        }
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+        button:disabled {
+            background-color: #ccc !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .aitc { background-color: #2e7d32; } 
+        .bjp { background-color: #ff9933; }  
+        .inc { background-color: #138808; }  
+        .others { background-color: #607d8b; }
+        
+        button:active:not(:disabled) { transform: scale(0.95); }
+        #status-msg { color: #d32f2f; margin-top: 15px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <h2>🗳️ Election Fan Vote</h2>
+    
+    <div class="party-card" style="border-color: #2e7d32;">
+        <span>AITC (TMC)</span>
+        <span id="count-aitc" class="count">0</span>
+    </div>
+    <div class="party-card" style="border-color: #ff9933;">
+        <span>BJP</span>
+        <span id="count-bjp" class="count">0</span>
+    </div>
+    <div class="party-card" style="border-color: #138808;">
+        <span>INC</span>
+        <span id="count-inc" class="count">0</span>
+    </div>
+    <div class="party-card" style="border-color: #607d8b;">
+        <span>Others</span>
+        <span id="count-others" class="count">0</span>
+    </div>
+
+    <div class="btn-grid" id="button-container">
+        <button class="aitc" onclick="vote('aitc')">Vote AITC</button>
+        <button class="bjp" onclick="vote('bjp')">Vote BJP</button>
+        <button class="inc" onclick="vote('inc')">Vote INC</button>
+        <button class="others" onclick="vote('others')">Vote Others</button>
+    </div>
+    <p id="status-msg">You have already cast your vote!</p>
+</div>
+
+<script>
+    // Check if the user has already voted when the page loads
+    window.onload = function() {
+        if (localStorage.getItem('hasVoted')) {
+            disableVoting();
+        }
+    };
+
+    function vote(party) {
+        // Double check in case they try to bypass
+        if (localStorage.getItem('hasVoted')) {
+            alert("You can only vote once!");
+            return;
+        }
+
+        // 1. Update the display
+        let element = document.getElementById('count-' + party);
+        let currentVotes = parseInt(element.innerText);
+        element.innerText = currentVotes + 1;
+        
+        // 2. Save the "voted" status to the phone's memory
+        localStorage.setItem('hasVoted', 'true');
+        
+        // 3. Disable the buttons immediately
+        disableVoting();
+
+        if (navigator.vibrate) {
+            navigator.vibrate(100);
+        }
+    }
+
+    function disableVoting() {
+        // Disable all buttons in the grid
+        const buttons = document.querySelectorAll('#button-container button');
+        buttons.forEach(btn => btn.disabled = true);
+        
+        // Show the status message
+        document.getElementById('status-msg').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
